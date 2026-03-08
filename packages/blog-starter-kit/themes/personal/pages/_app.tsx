@@ -1,6 +1,7 @@
 import { ThemeProvider } from 'next-themes';
 import { AppProps } from 'next/app';
 import { useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import '../styles/index.css';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
@@ -15,6 +16,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 	return (
 		<ThemeProvider attribute="class">
 			<Component {...pageProps} />
+			<Analytics />
 		</ThemeProvider>
 	);
 }
