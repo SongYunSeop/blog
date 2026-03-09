@@ -1,0 +1,50 @@
+name: Discord Deploy Notification
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Vercel deployment
+        id: vercel
+        run: |
+          sleep 10
+          for i in {1..30}; do
+            STATUS=$(curl -s "https://api.vercel.com/v6/deployments?projectId=prj_LHf6aQjsY2ZRAVHKNOqWvMyKcITN&limit=1" \
+              -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" | \
+              python3 -c "import sys,json; deps=json.load(sys.stdin).get('deployments',[]); print(deps[0]['state'] if deps else 'UNKNOWN')")
+            echo "Status: $STATUS"
+            if [ "$STATUS" = "READY" ] || [ "$STATUS" = "ERROR" ] || [ "$STATUS" = "CANCELED" ]; then
+              echo "state=$STATUS" >> $GITHUB_OUTPUT
+              break
+            fi
+            sleep 10
+          done
+
+      - name: Send Discord notification
+        run: |
+          STATE="${{ steps.vercel.outputs.state }}"
+          if [ "$STATE" = "READY" ]; then
+            EMOJI="✅"
+            COLOR="3066993"
+            TITLE="배포 성공"
+          else
+            EMOJI="❌"
+            COLOR="15158332"
+            TITLE="배포 실패 ($STATE)"
+          fi
+
+          curl -s -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"embeds\": [{
+                \"title\": \"$EMOJI $TITLE — blog\",
+                \"description\": \"Branch: \`main\` | Commit: \`${{ github.sha }}\`\n${{ github.event.head_commit.message }}\",
+                \"color\": $COLOR,
+                \"url\": \"https://songyunseop.com\",
+                \"footer\": {\"text\": \"Vercel × GitHub Actions\"}
+              }]
+            }"
