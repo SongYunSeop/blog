@@ -97,12 +97,15 @@ const Post = ({ publication, post }: PostProps) => {
 			<Head>
 				<title>{post.seo?.title || post.title}</title>
 				<link rel="canonical" href={post.url} />
-				<meta name="description" content={post.seo?.description || post.subtitle || post.brief} />
+				<meta name="description" content={(post.seo?.description || post.subtitle || post.brief || '').slice(0, 160)} />
+				<meta property="og:url" content={post.url} />
+				<meta property="og:title" content={post.seo?.title || post.title} />
+				<meta property="og:description" content={(post.seo?.description || post.subtitle || post.brief || '').slice(0, 160)} />
 				<meta property="twitter:card" content="summary_large_image" />
 				<meta property="twitter:title" content={post.seo?.title || post.title} />
 				<meta
 					property="twitter:description"
-					content={post.seo?.description || post.subtitle || post.brief}
+					content={(post.seo?.description || post.subtitle || post.brief || '').slice(0, 160)}
 				/>
 				<meta
 					property="og:image"
