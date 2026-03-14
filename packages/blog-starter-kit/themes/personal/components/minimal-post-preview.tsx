@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { User } from '../generated/graphql';
 import { DateFormatter } from './date-formatter';
@@ -11,26 +10,13 @@ type Props = {
 	author: Author;
 	slug: string;
 	commentCount: number;
-	coverImage?: string | null;
 };
 
-export const MinimalPostPreview = ({ title, date, slug, commentCount, coverImage }: Props) => {
+export const MinimalPostPreview = ({ title, date, slug, commentCount }: Props) => {
 	const postURL = `/${slug}`;
 
 	return (
-		<section className="flex flex-col items-start gap-2">
-			{coverImage && (
-				<Link href={postURL} className="w-full overflow-hidden rounded-lg">
-					<Image
-						src={coverImage}
-						alt={title}
-						width={800}
-						height={420}
-						className="w-full object-cover transition-transform duration-300 hover:scale-105"
-						style={{ maxHeight: '240px' }}
-					/>
-				</Link>
-			)}
+		<section className="flex flex-col items-start gap-1">
 			<h2 className="text-lg leading-tight tracking-tight text-black dark:text-white">
 				<Link href={postURL}>{title}</Link>
 			</h2>
