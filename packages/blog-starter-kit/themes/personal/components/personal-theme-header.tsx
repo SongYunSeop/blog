@@ -14,19 +14,40 @@ function hasUrl(
 export const PersonalHeader = () => {
 	const { publication } = useAppContext();
 
+	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+	const hashnodeHost = process.env.NEXT_PUBLIC_HASHNODE_PUBLICATION_HOST || '';
+
+	const normalizeUrl = (url: string) => {
+		if (hashnodeHost && url.includes(hashnodeHost)) {
+			const path = url.replace(/https?:\/\/[^/]+/, '');
+			return siteUrl ? `${siteUrl}${path}` : path;
+		}
+		return url;
+	};
+
 	const navbarItems = publication.preferences.navbarItems.filter(hasUrl);
 	const visibleItems = navbarItems.slice(0, 2);
 	const hiddenItems = navbarItems.slice(2);
 
 	const navList = (
 		<ul className="flex list-none flex-row items-center gap-4 text-xs font-semibold uppercase tracking-tight text-neutral-600 dark:text-neutral-300">
-			{visibleItems.map((item) => (
-				<li key={item.url}>
-					<a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-						{item.label}
-					</a>
-				</li>
-			))}
+			{visibleItems.map((item) => {
+				const url = normalizeUrl(item.url!);
+				const isInternal = url.startsWith('/') || url.startsWith(siteUrl);
+				return (
+					<li key={item.url}>
+						{isInternal ? (
+							<Link href={url.startsWith(siteUrl) ? url.replace(siteUrl, '') : url} className="hover:underline">
+								{item.label}
+							</Link>
+						) : (
+							<a href={url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+								{item.label}
+							</a>
+						)}
+					</li>
+				);
+			})}
 
 			{hiddenItems.length > 0 && (
 				<li>
