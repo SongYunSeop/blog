@@ -202,12 +202,22 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({ params }) 
 
 	const postData = await request(endpoint, SinglePostByPublicationDocument, { host, slug });
 
+	const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL;
+
 	if (postData.publication?.post) {
+		const post = postData.publication.post;
+		const publication = postData.publication;
 		return {
 			props: {
 				type: 'post',
-				post: postData.publication.post,
-				publication: postData.publication,
+				post: {
+					...post,
+					url: siteUrl ? `${siteUrl}/${post.slug}` : post.url,
+				},
+				publication: {
+					...publication,
+					url: siteUrl || publication.url,
+				},
 			},
 			revalidate: 1,
 		};
@@ -216,11 +226,15 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({ params }) 
 	const pageData = await request(endpoint, PageByPublicationDocument, { host, slug });
 
 	if (pageData.publication?.staticPage) {
+		const publication = pageData.publication;
 		return {
 			props: {
 				type: 'page',
 				page: pageData.publication.staticPage,
-				publication: pageData.publication,
+				publication: {
+					...publication,
+					url: siteUrl || publication.url,
+				},
 			},
 			revalidate: 1,
 		};

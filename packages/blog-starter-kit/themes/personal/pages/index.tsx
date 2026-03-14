@@ -123,10 +123,14 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 		};
 	}
 	const initialPosts = (publication.posts.edges ?? []).map((edge) => edge.node);
+	const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL;
 
 	return {
 		props: {
-			publication,
+			publication: {
+				...publication,
+				url: siteUrl || publication.url,
+			},
 			initialPosts,
 			initialPageInfo: publication.posts.pageInfo,
 		},
