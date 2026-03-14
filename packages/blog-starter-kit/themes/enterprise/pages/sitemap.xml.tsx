@@ -78,9 +78,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 		posts,
 	});
 
-	res.setHeader('Cache-Control', 's-maxage=1, stale-while-revalidate');
+	const debugXml = xml.replace(
+		'<?xml version="1.0" encoding="UTF-8"?>',
+		`<?xml version="1.0" encoding="UTF-8"?><!-- generated-by:v4 host:${req.headers.host} siteUrl:${siteUrl} -->`,
+	);
+
+	res.setHeader('Cache-Control', 'no-store');
 	res.setHeader('content-type', 'text/xml');
-	res.write(xml);
+	res.write(debugXml);
 	res.end();
 
 	return { props: {} };
