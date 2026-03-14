@@ -48,6 +48,7 @@ renderer.tablecell = function (content) {
 const markedOpts = {
 	renderer: renderer,
 	gfm: true,
+	breaks: true,
 	tables: true,
 	sanitize: false,
 	// @ts-ignore
