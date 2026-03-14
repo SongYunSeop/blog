@@ -15,7 +15,13 @@ const MAX_POSTS = 1000;
 const Sitemap = () => null;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-	const { res } = ctx;
+	const { req, res } = ctx;
+	const host = req.headers.host;
+	const protocol = req.headers['x-forwarded-proto'] ?? 'https';
+	const siteUrl =
+		process.env.SITE_URL ??
+		process.env.NEXT_PUBLIC_SITE_URL ??
+		(host ? `${protocol}://${host}` : null);
 
 	const initialData = await request<SitemapQuery, SitemapQueryVariables>(
 		GQL_ENDPOINT,
@@ -68,7 +74,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
 	const xml = getSitemap({
 		...publication,
-		url: process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? publication.url,
+		url: siteUrl ?? publication.url,
 		posts,
 	});
 
