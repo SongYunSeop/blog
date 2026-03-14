@@ -68,6 +68,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
 	const xml = getSitemap({
 		...publication,
+		url: process.env.NEXT_PUBLIC_SITE_URL ?? publication.url,
 		posts,
 	});
 
