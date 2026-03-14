@@ -9,7 +9,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 		throw new Error('Could not determine host');
 	}
 
-	const sitemapUrl = `https://${host}/sitemap.xml`;
+	const requestHost = ctx.req.headers.host;
+	const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || (requestHost ? `https://${requestHost}` : `https://${host}`);
+	const sitemapUrl = `${siteUrl}/sitemap.xml`;
 	const robotsTxt = `
 User-agent: *
 Allow: /
