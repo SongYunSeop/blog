@@ -24,8 +24,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 	}
 	const allPosts = publication.posts.edges.map((edge) => edge.node);
 
+	// Override publication.url with custom domain (Hashnode returns hashnode.dev URL)
+	const siteUrl =
+		process.env.SITE_URL ||
+		process.env.NEXT_PUBLIC_SITE_URL ||
+		(ctx.req.headers['x-forwarded-proto']
+			? `${ctx.req.headers['x-forwarded-proto']}://${ctx.req.headers.host}`
+			: `https://${ctx.req.headers.host}`);
+	const publicationWithCustomUrl = { ...publication, url: siteUrl };
+
 	const xml = constructRSSFeedFromPosts(
-		publication,
+		publicationWithCustomUrl,
 		allPosts,
 		after,
 		publication.posts.pageInfo.hasNextPage && publication.posts.pageInfo.endCursor
